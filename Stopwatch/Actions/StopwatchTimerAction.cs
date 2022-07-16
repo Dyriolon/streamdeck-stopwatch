@@ -244,13 +244,12 @@ namespace Stopwatch.Actions
 
         private string SecondsToReadableFormat(long total, string delimiter, bool secondsOnNewLine)
         {
-            long minutes, seconds, hours;
+            long minutes, seconds;
             minutes = total / 60;
             seconds = total % 60;
-            hours = minutes / 60;
             minutes %= 60;
 
-            return $"{hours.ToString("00")}{delimiter}{minutes.ToString("00")}{(secondsOnNewLine ? "\n" : delimiter)}{seconds.ToString("00")}";
+            return $"{minutes.ToString("00")}{(secondsOnNewLine ? "\n" : delimiter)}{seconds.ToString("00")}";
         }
 
         private async void TmrOnTick_Elapsed(object sender, ElapsedEventArgs e)
@@ -262,7 +261,7 @@ namespace Stopwatch.Actions
             CheckIfResetNeeded();
 
             long total = StopwatchManager.Instance.GetStopwatchTime(stopwatchId);
-            await Connection.SetTitleAsync(SecondsToReadableFormat(total, delimiter, true));
+            await Connection.SetTitleAsync(SecondsToReadableFormat(total, delimiter, false));
             await Connection.SetImageAsync(StopwatchManager.Instance.IsStopwatchEnabled(stopwatchId) ? enabledImage : pauseImage);
         }
         private Task SaveSettings()
