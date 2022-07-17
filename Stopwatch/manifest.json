@@ -6,7 +6,7 @@
       "States": [
         {
           "Image": "Images/bg",
-          "TitleAlignment": "bottom",
+          "TitleAlignment": "middle",
           "FontSize": "16",
           "Name": "Toggle"
         },
@@ -32,7 +32,7 @@
   "URL": "https://BarRaider.com/",
   "Version": "1.7",
   "CodePath": "com.barraider.stopwatch",
-  "Category": "BarRaider",
+  "Category": "BarRaider - Dyrio Edit",
   "CategoryIcon": "Images/categoryIcon",
   "OS": [
     {
