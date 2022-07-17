@@ -31,7 +31,7 @@ namespace Stopwatch.Actions
                 PluginSettings instance = new PluginSettings
                 {
                     ResumeOnClick = false,
-                    Multiline = false,
+                    Multiline = true,
                     ClearFileOnReset = false,
                     LapMode = false,
                     FileName = String.Empty,
@@ -260,9 +260,17 @@ namespace Stopwatch.Actions
             // so this is the best place to determine if we need to reset (versus the internal timer which may be paused)
             CheckIfResetNeeded();
 
-            long total = StopwatchManager.Instance.GetStopwatchTime(stopwatchId);
-            await Connection.SetTitleAsync(SecondsToReadableFormat(total, delimiter, false));
-            await Connection.SetImageAsync(StopwatchManager.Instance.IsStopwatchEnabled(stopwatchId) ? enabledImage : pauseImage);
+            if (StopwatchManager.Instance.IsStopwatchEnabled(stopwatchId))
+            {
+                long total = StopwatchManager.Instance.GetStopwatchTime(stopwatchId);
+                await Connection.SetTitleAsync(SecondsToReadableFormat(total, delimiter, false));
+                await Connection.SetImageAsync(enabledImage);
+            }
+            else
+            {
+                await Connection.SetTitleAsync("");
+                await Connection.SetImageAsync(pauseImage);
+            }
         }
         private Task SaveSettings()
         {
@@ -296,15 +304,6 @@ namespace Stopwatch.Actions
                         string propertyName = (string)payload["property_name"];
                         string pickerTitle = (string)payload["picker_title"];
                         string pickerFilter = (string)payload["picker_filter"];
-                        string fileName = PickersUtil.Pickers.SaveFilePicker(pickerTitle, null, pickerFilter);
-                        if (!string.IsNullOrEmpty(fileName))
-                        {
-                            if (!PickersUtil.Pickers.SetJsonPropertyValue(settings, propertyName, fileName))
-                            {
-                                Logger.Instance.LogMessage(TracingLevel.ERROR, "Failed to save picker value to settings");
-                            }
-                            SaveSettings();
-                        }
                         break;
                 }
             }
