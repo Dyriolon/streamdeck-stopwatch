@@ -116,6 +116,16 @@ namespace Stopwatch.Backend
             }
             return dicCounters[stopwatchId].IsEnabled;
         }
+        
+        public bool IsStopwatchPaused(string stopwatchId)
+        {
+            long total = GetStopwatchTime(stopwatchId);
+            if (total > 0)
+            {
+                return true;
+            }
+            return false;
+        }
 
         public void TouchTimerFile(string filename)
         {
