@@ -30,14 +30,15 @@ namespace Stopwatch.Actions
             {
                 PluginSettings instance = new PluginSettings
                 {
-                    ResumeOnClick = false,
+                    ResumeOnClick = true,
                     Multiline = true,
                     ClearFileOnReset = false,
                     LapMode = false,
                     FileName = String.Empty,
                     SharedId = String.Empty,
-                    PauseImageFile = String.Empty,
-                    EnabledImageFile = String.Empty
+                    IdleImageFile = String.Empty,
+                    EnabledImageFile = String.Empty,
+                    PausedImageFile = String.Empty
                 };
 
                 return instance;
@@ -62,12 +63,16 @@ namespace Stopwatch.Actions
             public string SharedId { get; set; }
 
             [FilenameProperty]
-            [JsonProperty(PropertyName = "pauseImageFile")]
-            public string PauseImageFile { get; set; }
+            [JsonProperty(PropertyName = "idleImageFile")]
+            public string IdleImageFile { get; set; }
 
             [FilenameProperty]
             [JsonProperty(PropertyName = "enabledImageFile")]
             public string EnabledImageFile { get; set; }
+
+            [FilenameProperty]
+            [JsonProperty(PropertyName = "pausedImageFile")]
+            public string PausedImageFile { get; set; }
 
         }
 
@@ -77,7 +82,8 @@ namespace Stopwatch.Actions
         private readonly string[] DEFAULT_IMAGES = new string[]
         {
             @"images\bg@2x.png",
-            @"images\bgEnabled.png"
+            @"images\bgEnabled@2x.png",
+            @"images\bgPaused@2x.png"
         };
 
         private readonly PluginSettings settings;
@@ -86,8 +92,9 @@ namespace Stopwatch.Actions
         private DateTime keyPressStart;
         private string stopwatchId;
         private readonly System.Timers.Timer tmrOnTick = new System.Timers.Timer();
-        private Image pauseImage;
+        private Image idleImage;
         private Image enabledImage;
+        private Image pausedImage;
 
 
         #endregion
@@ -266,10 +273,16 @@ namespace Stopwatch.Actions
                 await Connection.SetTitleAsync(SecondsToReadableFormat(total, delimiter, false));
                 await Connection.SetImageAsync(enabledImage);
             }
+            else if (StopwatchManager.Instance.IsStopwatchPaused(stopwatchId))
+            {
+                long total = StopwatchManager.Instance.GetStopwatchTime(stopwatchId);
+                await Connection.SetTitleAsync(SecondsToReadableFormat(total, delimiter, false));
+                await Connection.SetImageAsync(pausedImage);
+            }
             else
             {
                 await Connection.SetTitleAsync("");
-                await Connection.SetImageAsync(pauseImage);
+                await Connection.SetImageAsync(idleImage);
             }
         }
         private Task SaveSettings()
@@ -311,12 +324,12 @@ namespace Stopwatch.Actions
 
         private void PrefetchImages()
         {
-            if (pauseImage != null)
+            if (idleImage != null)
             {
-                pauseImage.Dispose();
-                pauseImage = null;
+                idleImage.Dispose();
+                idleImage = null;
             }
-            pauseImage = TryLoadCustomImage(settings.PauseImageFile, DEFAULT_IMAGES[0]);
+            idleImage = TryLoadCustomImage(settings.IdleImageFile, DEFAULT_IMAGES[0]);
 
             if (enabledImage != null)
             {
@@ -324,6 +337,13 @@ namespace Stopwatch.Actions
                 enabledImage = null;
             }
             enabledImage = TryLoadCustomImage(settings.EnabledImageFile, DEFAULT_IMAGES[1]);
+
+            if (pausedImage != null)
+            {
+                pausedImage.Dispose();
+                pausedImage = null;
+            }
+            pausedImage = TryLoadCustomImage(settings.PausedImageFile, DEFAULT_IMAGES[2]);
         }
 
         private Image TryLoadCustomImage(string customImageFileName, string defaultImageFileName)
