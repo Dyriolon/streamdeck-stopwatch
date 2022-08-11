@@ -2,7 +2,7 @@
   "Actions": [
     {
       "Icon": "Images/icon",
-      "Name": "Stopwatch",
+      "Name": "Stopwatch - Dyrio Edit",
       "States": [
         {
           "Image": "Images/bg",
@@ -27,10 +27,10 @@
   ],
   "Author": "BarRaider",
   "Description": "Stopwatch that you can also display on your stream.",
-  "Name": "Stopwatch",
+  "Name": "Stopwatch - DyrioEdit",
   "Icon": "Images/pluginIcon",
   "URL": "https://BarRaider.com/",
-  "Version": "1.7",
+  "Version": "1.7a.1",
   "CodePath": "com.barraider.stopwatch",
   "Category": "BarRaider - Dyrio Edit",
   "CategoryIcon": "Images/categoryIcon",
