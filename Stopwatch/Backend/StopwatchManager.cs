@@ -117,8 +117,12 @@ namespace Stopwatch.Backend
             return dicCounters[stopwatchId].IsEnabled;
         }
         
-        public bool IsStopwatchPaused(string stopwatchId)
+        public bool IsStopwatchBeenActivated(string stopwatchId)
         {
+            if (IsStopwatchEnabled(stopwatchId))
+            {
+                return true;
+            }
             long total = GetStopwatchTime(stopwatchId);
             if (total > 0)
             {
