@@ -31,7 +31,7 @@ namespace Stopwatch.Actions
                 PluginSettings instance = new PluginSettings
                 {
                     ResumeOnClick = true,
-                    Multiline = true,
+                    Multiline = false,
                     ClearFileOnReset = false,
                     LapMode = false,
                     FileName = String.Empty,
@@ -251,12 +251,13 @@ namespace Stopwatch.Actions
 
         private string SecondsToReadableFormat(long total, string delimiter, bool secondsOnNewLine)
         {
-            long minutes, seconds;
+            long minutes, seconds, hours;
             minutes = total / 60;
             seconds = total % 60;
+            hours = minutes / 60;
             minutes %= 60;
 
-            return $"{minutes.ToString("00")}{(secondsOnNewLine ? "\n" : delimiter)}{seconds.ToString("00")}";
+            return $"{(hours > 0 ? hours.ToString("0") + delimiter : "")}{minutes.ToString("00")}{(secondsOnNewLine ? "\n" : delimiter)}{seconds.ToString("00")}";
         }
 
         private async void TmrOnTick_Elapsed(object sender, ElapsedEventArgs e)
@@ -267,17 +268,11 @@ namespace Stopwatch.Actions
             // so this is the best place to determine if we need to reset (versus the internal timer which may be paused)
             CheckIfResetNeeded();
 
-            if (StopwatchManager.Instance.IsStopwatchEnabled(stopwatchId))
+            if (StopwatchManager.Instance.IsStopwatchBeenActivated(stopwatchId))
             {
                 long total = StopwatchManager.Instance.GetStopwatchTime(stopwatchId);
-                await Connection.SetTitleAsync(SecondsToReadableFormat(total, delimiter, false));
-                await Connection.SetImageAsync(enabledImage);
-            }
-            else if (StopwatchManager.Instance.IsStopwatchPaused(stopwatchId))
-            {
-                long total = StopwatchManager.Instance.GetStopwatchTime(stopwatchId);
-                await Connection.SetTitleAsync(SecondsToReadableFormat(total, delimiter, false));
-                await Connection.SetImageAsync(pausedImage);
+                await Connection.SetTitleAsync(SecondsToReadableFormat(total, delimiter, true));
+                await Connection.SetImageAsync(StopwatchManager.Instance.IsStopwatchEnabled(stopwatchId) ? enabledImage : pausedImage);
             }
             else
             {
